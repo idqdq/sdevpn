@@ -77,3 +77,14 @@ and it seems to work:
 *[create_evpn.py](create_evpn.py) file is running*
 
 ![](img/evpn_with_netconf.png)
+
+## 3. wrap all that corks and features into a usefull web application
+
+Now we need to wrap it with API to make it a backend  
+And we'll be using [FastAPI](https://fastapi.tiangolo.com/) framework for that
+
+to start backend server from within a folder backend type:  
+> \> uvicorn routes:app
+
+it will start web server on http://localhost:8000
+
