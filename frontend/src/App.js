@@ -15,7 +15,7 @@ class App extends Component {
     async componentDidMount(){
         const response = await fetch(URL);
         const data = await response.json();
-        this.setState({ evpnData: data.evpnData, isFetching: false })
+        this.setState({ evpnData: data, isFetching: false })
     }
 
     openModal = () => {

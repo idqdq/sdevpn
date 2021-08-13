@@ -105,7 +105,7 @@ class evpn_data:
     vlan_id: int
     vni: int
     # optional data (with defaults)
-    ip_address: str = '' # can be blank for a remove operation but mandatory for a creating one
+    ip_address: str = '' # it can be blank in case of 'remove' operation but it's absolutely mandatory for the 'create' operation
     vlan_name: str = ''
     mtu: int = 1500
     description: str = 'anycast SVI'
@@ -120,7 +120,7 @@ class evpn_data:
                         ypath_ipv4.format(vlan_id=self.vlan_id, vrf_name=self.vrf_name),
                         ypath_svianycast.format(vlan_id=self.vlan_id),
                         ypath_nve.format(vni=self.vni),
-                        ypath_evpn.format(vni=self.vni)]      
+                        ypath_evpn.format(vni=self.vni)]
 
     
     def get_rpc_create(self):
