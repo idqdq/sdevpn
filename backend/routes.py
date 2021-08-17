@@ -1,3 +1,4 @@
+#import uvicorn
 from fastapi import FastAPI, Request, Body, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
@@ -42,7 +43,7 @@ app.add_middleware(
 ## CORS end
 
 ## FastAPI Routes
-@app.get("/getEvpnAll", response_model=List[EvpnDataClass])
+@app.get("/evpn", response_model=List[EvpnDataClass])
 async def getEvpnAll():
     evpns = []
         
@@ -53,7 +54,7 @@ async def getEvpnAll():
     return evpns
 
 
-@app.get("/getEvpn/{vni}")    
+@app.get("/evpn/{vni}", response_model=EvpnDataClass)  
 async def getEvpn(vni: int):
     if (evpn := await app.db.evpn.find_one({"vni": vni})) is not None:
         return evpn
@@ -61,16 +62,35 @@ async def getEvpn(vni: int):
     raise HTTPException(status_code=404, detail=f"VNI: {id} not found")
 
 
-@app.post("/createEvpn")
+@app.post("/evpn")
 async def createEvpn(evpn: EvpnDataClass = Body(...)):
-    
-    evpn = jsonable_encoder(evpn)
+    evpn = jsonable_encoder(evpn)    
     new_evpn = await app.db.evpn.insert_one(evpn)
-
     created_evpn = await app.db.evpn.find_one({"_id": new_evpn.inserted_id})
 
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_evpn)
 
+
+@app.put("/evpn/", response_description="Update evpn", response_model=EvpnDataClass)
+async def updateEvpn(evpn: EvpnDataClass = Body(...)):
+    evpn = jsonable_encoder(evpn)
+    # update model shoudn't include _id because mongo will not allow mutate _id in update procedure 
+    # so we have to create another data class for the update or just get rid of _id from the existed model 
+    evpn.pop("_id") 
+    
+    if (existed_evpn := await app.db.evpn.find_one({"vni": evpn["vni"]})) is not None:        
+        update_res = await app.db.evpn.update_one({"_id": existed_evpn["_id"] }, {"$set": evpn})
+        if update_res.modified_count == 1:
+            result = await app.db.evpn.find_one({"vni": evpn["vni"]})
+        else: 
+            result = existed_evpn
+                
+    else: 
+        raise HTTPException(status_code=404, detail=f"EVPN {evpn['vni']} not found")
+    
+    print(result)
+    return JSONResponse(status_code=status.HTTP_200_OK, content=result)
+  
 
 
 #if __name__ == "__main__":

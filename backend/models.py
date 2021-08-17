@@ -22,16 +22,15 @@ class PyObjectId(ObjectId):
 class EvpnDataClass(BaseModel):
     id: PyObjectId = Field(default_factory=PyObjectId, alias="_id")
     # mandatory data
-    vlan_id: int
-    vni: int
+    vlan_id: int = Field(..., gt=1, lt=4096)
+    vni: int = Field(..., ge=10000, lt=10999)
     svi_ip: IPv4Interface
     # optional data (with defaults)
     vlan_name: str = None
-    mtu: Union[int, str] = 1500
+    mtu: int = Field(1500, ge=1280, le=9216)
     svi_descr: str = 'anycast SVI'
     vrf: str = 'Tenant-1'
-    mgroup: IPv4Address = None
-    #mgroup: str = '231.1.1.111'
+    mgroup: Optional[IPv4Address]
     arpsup: bool = False
 
     class Config:
@@ -52,16 +51,38 @@ class EvpnDataClass(BaseModel):
             }
         }
 
+    """
     @validator('vlan_id')
-    def v_name(cls, v):
+    def v_vlan_id(cls, v):
         if not 1 < v < 4096:
             raise ValueError('vlan_id must be within range 1..4096 ')
         return v
 
+    @validator('vni')
+    def v_vni(cls, v):
+        if not 10000 < v < 10999:
+            raise ValueError('vlan_id must be within range 10000..10999')
+        return v
 
-class Update_EvpnDataClass(BaseModel):    
-    vlan_id: Optional[int]
-    vni: Optional[int]
+    @validator('mtu')
+    def v_vni(cls, v):
+        if not 1280 <= v <= 9216:
+            raise ValueError('vlan_id must be within range 1280..9216')
+        return v
+    """
+
+    @validator('mgroup')
+    def v_svi_ip(cls,v):
+        if v is not None:
+            assert IPv4Address(v).is_multicast, 'mgorup address must be multicast address'
+        return v        
+    
+
+
+
+class Update_EvpnDataClass(BaseModel):   
+    vlan_id: int = Field(..., gt=1, lt=4096)
+    vni: int = Field(..., ge=10000, lt=10999)     
     svi_ip: Optional[IPv4Interface]
     vlan_name: Optional[str]
     mtu: Optional[int]
@@ -87,10 +108,3 @@ class Update_EvpnDataClass(BaseModel):
             }
         }
 
-"""
-evpnData = [
-    { "id": 10, "data": {"vlan_id": 10,"vni": 10010,"vlan_name":"","svi_ip":"","svi_descr":"","mtu":"","vrf":"","mgroup":"","arpsup": true }},
-    { "id": 20, "data": {"vlan_id": 20,"vni": 10020,"vlan_name":"","svi_ip":"","svi_descr":"","mtu":"","vrf":"","mgroup":"","arpsup": false }},
-    { "id": 30, "data": {"vlan_id": 30,"vni": 10030,"vlan_name":"Vlan30","svi_ip":"10.1.30.254/24","svi_descr":"","mtu":"1600","vrf":"Tenant-1","mgroup":"231.0.0.30","arpsup":true }},
-]
-"""
