@@ -66,6 +66,10 @@ class Form extends Component {
         const cidrIpAddrPattern = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\/(3[0-2]|[1-2][0-9]|[0-9])$)/;
         const mcastIpAddrPattern = /^(22[4-9]|23[0-9])\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
+        if (['vlan_id', 'vni', 'mtu'].indexOf(name) > -1){
+            value = Number(value);            
+        }
+
         switch(name) {
             case 'vlan_id':                
                 if (this.index!==undefined && this.props.evpn[this.index].vlan_id===value) 
@@ -78,7 +82,7 @@ class Form extends Component {
                 }
                 break;
 
-            case 'vni':
+            case 'vni':                 
                 if (this.index!==undefined && this.props.evpn[this.index].vni===value) 
                     break;  //old value
                 if(!(!isNaN(value) && value > 10000 && value < 10999)) {
