@@ -12,10 +12,14 @@ class App extends Component {
         isFetching: true,
     }
 
-    async componentDidMount(){
+    loaddata = async () => {
         const response = await fetch(URL);
         const data = await response.json();
         this.setState({ evpnData: data, isFetching: false })
+    }
+
+    async componentDidMount(){
+        await this.loaddata();
     }
 
     openModal = () => {
@@ -64,11 +68,18 @@ class App extends Component {
 
     render() {
         const { evpnData, index } = this.state
-         
+        const buttonStyle = {
+            margin: '0px 5px',
+        }
+
         return (
             <div className="container">
                 <Table evpnData={evpnData} evpnRemove={this.evpnRemove} evpnEdit={this.evpnEdit}/>
-                <button onClick={this.openModal}>New</button>
+                <div>
+                    <button onClick={this.openModal} style={buttonStyle}>New</button>
+                    <button onClick={this.loaddata} style={buttonStyle} className="btn-secondary">ReLoad</button>
+                    <button onClick={this.openModal} style={buttonStyle} className="btn-danger">Submit</button>
+                </div>
                 <MyModal evpn={evpnData} index={index} isOpen={this.state.isOpen} hideModal={this.hideModal} handleSubmit={this.handleSubmit}/>                           
             </div>
         )

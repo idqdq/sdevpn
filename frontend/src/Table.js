@@ -18,6 +18,10 @@ const TableHeader = () => {
     )
 }
 
+const buttonStyle = {
+    margin: '0px 5px',
+}
+
 const TableBody = (props) => {
     const rows = props.evpnData.map((row, index) => {
         return (
@@ -32,8 +36,8 @@ const TableBody = (props) => {
                 <td>{row.mgroup}</td>
                 <td>{row.arpsup ? "on": "off"}</td>
                 <td>
-                    <button onClick={() => props.evpnEdit(index)}>Edit</button>
-                    <button onClick={() => props.evpnRemove(index)}>Delete</button>
+                    <button onClick={() => props.evpnEdit(index)} style={buttonStyle}>Edit</button>
+                    <button onClick={() => props.evpnRemove(index)} style={buttonStyle} className="btn-danger">Delete</button>
                 </td>
             </tr>
 

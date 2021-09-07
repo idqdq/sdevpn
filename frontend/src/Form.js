@@ -134,7 +134,7 @@ class Form extends Component {
 
         return (            
             <form>                
-                <label htmlFor="vlan">vni</label>
+                <label htmlFor="vlan">vlan</label>
                 <input
                     type="number"
                     name="vlan_id"
@@ -226,7 +226,7 @@ class Form extends Component {
                     checked={arpsup}
                     onChange={this.handleClickArpSup}/>        
                 <div></div>
-                <input type="button" value="Submit" onClick={this.submitForm} disabled={!this.state.formValid} />                
+                <input type="button" value="Submit" onClick={this.submitForm} disabled={!this.state.formValid} className="btn-success   "/>                
             </form>            
         );
     }
