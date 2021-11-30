@@ -1,5 +1,5 @@
 import Modal from "react-bootstrap/Modal";
-import "bootstrap/dist/css/bootstrap.min.css";
+//import "bootstrap/dist/css/bootstrap.min.css";
 import Form from './Form'
 
 const MyModal = (props) => {
@@ -14,7 +14,7 @@ const MyModal = (props) => {
                 <Modal.Title>{modalTitle}</Modal.Title>
             </Modal.Header>
             <Modal.Body>
-                <Form handleSubmit={props.handleSubmit} evpn={props.evpn} index={props.index}/>
+                <Form handleSubmit={props.handleFormSubmit} evpn={props.evpn} changes={props.changes} index={props.index}/>
             </Modal.Body>
         </Modal>
     )

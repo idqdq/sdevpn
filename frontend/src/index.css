@@ -833,6 +833,8 @@
     background: #1cb864;
   }
   
+  button:disabled,
+  button[disabled],
   .muted-button,
   a.muted-button {
     background: transparent;

@@ -46,7 +46,7 @@ class EvpnDataClass(BaseModel):
                 "mtu": 1500,
                 "svi_descr": "SVI10",
                 "vrf": "Tenant-1",
-                "mgroup": "231.1.1.10",
+                "mgroup": "239.1.1.10",
                 "arpsup": False,
             }
         }
@@ -103,7 +103,7 @@ class Update_EvpnDataClass(BaseModel):
                 "mtu": 1500,
                 "svi_descr": "SVI10",
                 "vrf": "Tenant-1",
-                "mgroup": "231.1.1.10",
+                "mgroup": "239.1.1.10",
                 "arpsup": False,
             }
         }

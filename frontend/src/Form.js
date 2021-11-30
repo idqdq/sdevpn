@@ -77,7 +77,7 @@ class Form extends Component {
                 if(!(!isNaN(value) && value > 1 && value < 4096)) {
                     errors[name] = 'should be a number from 2 to 4096';                    
                 }
-                else if (this.props.evpn.find(x => value===x.vlan_id)){
+                else if ((this.props.evpn.find(x => value===x.vlan_id)) || (this.props.changes.hasOwnProperty(value))){
                     errors[name] = 'vlan_id ' + value + ' already exist'; 
                 }
                 break;
@@ -133,100 +133,147 @@ class Form extends Component {
         const { vlan_id, vni, vlan_name, svi_ip, svi_descr, mtu, vrf, mgroup, arpsup } = this.state.evpn;
 
         return (            
-            <form>                
-                <label htmlFor="vlan">vlan</label>
-                <input
-                    type="number"
-                    name="vlan_id"
-                    id="vlan_id"
-                    value={vlan_id}
-                    placeholder="10"
-                    onChange={this.handleChange}
-                    onBlur = {this.handleBlur} />
-                    <span style={{display: "block"}}><small className="form-text text-muted"><i>regular vlan number (range 1-4096)</i></small></span>
-                    <span style={{color: "red"}}>{this.state.errors["vlan_id"]}</span>
-                <label htmlFor="vni">vni</label>
-                <input
-                    type="number"
-                    name="vni"
-                    id="vni"
-                    value={vni}
-                    placeholder="10010"
-                    onChange={this.handleChange}
-                    onBlur = {this.handleBlur} />
-                    <span style={{display: "block"}}><small className="form-text text-muted"><i>vxlan identifier (range 10000-10999)</i></small></span>  
-                    <span style={{color: "red"}}>{this.state.errors["vni"]}</span>                            
-                <label htmlFor="vlan_name">vlan_name</label>
-                <input
-                    type="text"
-                    name="vlan_name"
-                    id="vlan_name"
-                    value={vlan_name}
-                    placeholder="vlan10"
-                    onChange={this.handleChange}
-                    onBlur = {this.handleBlur} />
-                    <span style={{display: "block"}}><small className="form-text text-muted"><b>optional</b></small></span>
-                <label htmlFor="svi_ip">svi_ip</label>
-                <input
-                    type="text"
-                    name="svi_ip"
-                    id="svi_ip"
-                    value={svi_ip}
-                    placeholder="10.1.10.254/24"
-                    onChange={this.handleChange}
-                    onBlur = {this.handleBlur} />
-                    <span style={{display: "block"}}><small className="form-text text-muted"><b>optional:</b> <i>IPv4 address in CIDR format e.g. a.b.c.d/x</i></small></span>
-                    <span style={{color: "red"}}>{this.state.errors["svi_ip"]}</span>
-                <label htmlFor="svi_descr">svi_descr</label>
-                <input
-                    type="text"
-                    name="svi_descr"
-                    id="svi_descr"
-                    value={svi_descr}
-                    placeholder="svi10"
-                    onChange={this.handleChange}
-                    onBlur = {this.handleBlur} />
-                    <span style={{display: "block"}}><small className="form-text text-muted"><b>optional</b></small></span>
-                <label htmlFor="mtu">mtu</label>
-                <input
-                    type="number"
-                    name="mtu"
-                    id="mtu"
-                    value={mtu}
-                    placeholder="1500"
-                    onChange={this.handleChange}
-                    onBlur = {this.handleBlur} />
-                    <span style={{display: "block"}}><small className="form-text text-muted"><b>optional:</b> <i>default 1500</i></small></span>
-                    <span style={{color: "red"}}>{this.state.errors["mtu"]}</span>
-                <label htmlFor="vrf">vrf</label>
-                <input
-                    type="text"
-                    name="vrf"
-                    id="vrf"
-                    value={vrf}
-                    placeholder="Tenant-1"
-                    onChange={this.handleChange}
-                    onBlur = {this.handleBlur} />
-                    <span style={{display: "block"}}><small className="form-text text-muted"><b>optional:</b> <i>default Tenant-1</i></small></span>
-                <label htmlFor="mgroup">mgroup</label>                
-                <input
-                    type="text"
-                    name="mgroup"
-                    id="mgroup"
-                    value={mgroup}
-                    placeholder="231.0.0.10"
-                    onChange={this.handleChange}
-                    onBlur = {this.handleBlur} />
-                    <span style={{display: "block"}}><small className="form-text text-muted"><b>optional</b></small></span>
-                    <span style={{color: "red"}}>{this.state.errors["mgroup"]}</span>
-                <label htmlFor="arpsup">Arp suppression</label>
-                <input type="checkbox"
-                    name="arpsup"
-                    id="arpsup"
-                    checked={arpsup}
-                    onChange={this.handleClickArpSup}/>        
-                <div></div>
-                <input type="button" value="Submit" onClick={this.submitForm} disabled={!this.state.formValid} className="btn-success   "/>                
+            <form>
+                <div class="mb-3 row">                
+                <label htmlFor="vlan" className="col-sm-2 col-form-label">vlan</label>
+                    <div class="col-sm-10">
+                        <input
+                            className="form-control"
+                            type="number"
+                            name="vlan_id"
+                            id="vlan_id"
+                            value={vlan_id}
+                            placeholder="10"
+                            onChange={this.handleChange}
+                            onBlur = {this.handleBlur} />
+                            <span style={{display: "block"}}><small className="form-text text-muted"><i>regular vlan number (range 1-4096)</i></small></span>
+                            <span style={{color: "red"}}>{this.state.errors["vlan_id"]}</span>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label htmlFor="vni" className="col-sm-2 col-form-label">vni</label>
+                    <div class="col-sm-10">
+                        <input
+                            className="form-control"
+                            type="number"
+                            name="vni"
+                            id="vni"
+                            value={vni}
+                            placeholder="10010"
+                            onChange={this.handleChange}
+                            onBlur = {this.handleBlur} />
+                            <span style={{display: "block"}}><small className="form-text text-muted"><i>vxlan identifier (range 10000-10999)</i></small></span>  
+                            <span style={{color: "red"}}>{this.state.errors["vni"]}</span>
+                    </div>
+                </div>        
+                <div class="mb-3 row">                   
+                    <label htmlFor="vlan_name" className="col-sm-2 col-form-label">vlan_name</label>
+                    <div class="col-sm-10">
+                        <input
+                            className="form-control"
+                            type="text"
+                            name="vlan_name"
+                            id="vlan_name"
+                            value={vlan_name}
+                            placeholder="vlan10"
+                            onChange={this.handleChange}
+                            onBlur = {this.handleBlur} />
+                            <span style={{display: "block"}}><small className="form-text text-muted"><i>vlan name (optional)</i></small></span>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label htmlFor="svi_ip" className="col-sm-2 col-form-label">svi_ip</label>
+                    <div class="col-sm-10">
+                        <input
+                            className="form-control"
+                            type="text"
+                            name="svi_ip"
+                            id="svi_ip"
+                            value={svi_ip}
+                            placeholder="10.1.10.254/24"
+                            onChange={this.handleChange}
+                            onBlur = {this.handleBlur} />
+                            <span style={{display: "block"}}><small className="form-text text-muted"><i>IPv4 address in CIDR format e.g. a.b.c.d/x (optional)</i></small></span>
+                            <span style={{color: "red"}}>{this.state.errors["svi_ip"]}</span>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label htmlFor="svi_descr" className="col-sm-2 col-form-label">svi_descr</label>
+                    <div class="col-sm-10">
+                        <input
+                            className="form-control"
+                            type="text"
+                            name="svi_descr"
+                            id="svi_descr"
+                            value={svi_descr}
+                            placeholder="svi10"
+                            onChange={this.handleChange}
+                            onBlur = {this.handleBlur} />
+                            <span style={{display: "block"}}><small className="form-text text-muted"><i>svi interface description (optional)</i></small></span>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label htmlFor="mtu" className="col-sm-2 col-form-label">mtu</label>
+                    <div class="col-sm-10">
+                        <input
+                            className="form-control"
+                            type="number"
+                            name="mtu"
+                            id="mtu"
+                            value={mtu}
+                            placeholder="1500"
+                            onChange={this.handleChange}
+                            onBlur = {this.handleBlur} />
+                            <span style={{display: "block"}}><small className="form-text text-muted"><i>default 1500</i></small></span>
+                            <span style={{color: "red"}}>{this.state.errors["mtu"]}</span>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                <label htmlFor="vrf" className="col-sm-2 col-form-label">vrf</label>
+                    <div class="col-sm-10">
+                        <input
+                            className="form-control"
+                            type="text"
+                            name="vrf"
+                            id="vrf"
+                            value={vrf}
+                            placeholder="Tenant-1"
+                            onChange={this.handleChange}
+                            onBlur={this.handleBlur} />
+                        <span style={{ display: "block" }}><small className="form-text text-muted"><i>default Tenant-1</i></small></span>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                <label htmlFor="mgroup" className="col-sm-2 col-form-label">mgroup</label>  
+                    <div class="col-sm-10">
+                        <input
+                            className="form-control"
+                            type="text"
+                            name="mgroup"
+                            id="mgroup"
+                            value={mgroup}
+                            placeholder="239.0.0.10"
+                            onChange={this.handleChange}
+                            onBlur={this.handleBlur} />
+                        <span style={{ display: "block" }}><small className="form-text text-muted"><i>multicast group (optional)</i></small></span>
+                        <span style={{ color: "red" }}>{this.state.errors["mgroup"]}</span>
+                    </div>
+                </div>
+                <div class="mb-3 row">
+                    <label htmlFor="arpsup" className="col-sm-2 col-form-label">Arp suppression</label>
+                    <div class="col-sm-5 mt-2">
+                        
+                            <input
+                                class="form-check-input"
+                                type="checkbox"
+                                name="arpsup"
+                                id="arpsup"
+                                checked={arpsup}
+                                onChange={this.handleClickArpSup} />
+                        
+                    </div>
+                </div>
+                <input type="button" value="Submit" onClick={this.submitForm} disabled={!this.state.formValid} className="btn btn-outline-success" />                
             </form>            
         );
     }
