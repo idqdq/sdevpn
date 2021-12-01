@@ -1,15 +1,18 @@
 import React, { Component } from 'react'
 
+const INTKEYS = ['vlan_id', 'vni', 'mtu'];
+const IPADDRESSKEYS = ['svi_ip', 'mgroup'];
+
 class Form extends Component {
        
     initialState = {
         evpn: {
-            vlan_id: '',
-            vni: '',
+            vlan_id: 0,
+            vni: 0,
             vlan_name: '',
             svi_ip: '',
             svi_descr: '',
-            mtu: '',
+            mtu: 1500,
             vrf: '',
             mgroup: '',
             arpsup: false,
@@ -57,7 +60,17 @@ class Form extends Component {
     }
 
     submitForm = () => {        
-        this.props.handleSubmit(this.state.evpn, this.index);
+        const evpn = Object.assign({}, this.state.evpn);
+        
+        for (let key of INTKEYS) {
+            evpn[key] = Number(evpn[key]);
+        }
+
+        for (let key of IPADDRESSKEYS) {
+            if (!evpn[key]) evpn[key] = null;
+        }
+
+        this.props.handleSubmit(evpn, this.index);
         this.setState(this.initialState)        
     }
 
@@ -66,7 +79,7 @@ class Form extends Component {
         const cidrIpAddrPattern = /^(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)(\/(3[0-2]|[1-2][0-9]|[0-9])$)/;
         const mcastIpAddrPattern = /^(22[4-9]|23[0-9])\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.(25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)$/;
 
-        if (['vlan_id', 'vni', 'mtu'].indexOf(name) > -1){
+        if (INTKEYS.indexOf(name) > -1){
             value = Number(value);            
         }
 
@@ -85,7 +98,7 @@ class Form extends Component {
             case 'vni':                 
                 if (this.index!==undefined && this.props.evpn[this.index].vni===value) 
                     break;  //old value
-                if(!(!isNaN(value) && value > 10000 && value < 10999)) {
+                if(!(!isNaN(value) && value >= 10000 && value <= 10999)) {
                     errors[name] = 'should be a number from 10000 to 10999';                    
                 }
                 else if (this.props.evpn.find(x => value===x.vni)){
@@ -134,15 +147,16 @@ class Form extends Component {
 
         return (            
             <form>
-                <div class="mb-3 row">                
+                <div className="mb-3 row">                
                 <label htmlFor="vlan" className="col-sm-2 col-form-label">vlan</label>
-                    <div class="col-sm-10">
+                    <div className="col-sm-10">
                         <input
                             className="form-control"
                             type="number"
                             name="vlan_id"
                             id="vlan_id"
-                            value={vlan_id}
+                            disabled={this.index}
+                            value={vlan_id || ''}
                             placeholder="10"
                             onChange={this.handleChange}
                             onBlur = {this.handleBlur} />
@@ -150,15 +164,16 @@ class Form extends Component {
                             <span style={{color: "red"}}>{this.state.errors["vlan_id"]}</span>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div className="mb-3 row">
                     <label htmlFor="vni" className="col-sm-2 col-form-label">vni</label>
-                    <div class="col-sm-10">
+                    <div className="col-sm-10">
                         <input
                             className="form-control"
                             type="number"
                             name="vni"
                             id="vni"
-                            value={vni}
+                            disabled={this.index}
+                            value={vni || ''}
                             placeholder="10010"
                             onChange={this.handleChange}
                             onBlur = {this.handleBlur} />
@@ -166,30 +181,30 @@ class Form extends Component {
                             <span style={{color: "red"}}>{this.state.errors["vni"]}</span>
                     </div>
                 </div>        
-                <div class="mb-3 row">                   
+                <div className="mb-3 row">                   
                     <label htmlFor="vlan_name" className="col-sm-2 col-form-label">vlan_name</label>
-                    <div class="col-sm-10">
+                    <div className="col-sm-10">
                         <input
                             className="form-control"
                             type="text"
                             name="vlan_name"
                             id="vlan_name"
-                            value={vlan_name}
+                            value={vlan_name || ''}
                             placeholder="vlan10"
                             onChange={this.handleChange}
                             onBlur = {this.handleBlur} />
                             <span style={{display: "block"}}><small className="form-text text-muted"><i>vlan name (optional)</i></small></span>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div className="mb-3 row">
                     <label htmlFor="svi_ip" className="col-sm-2 col-form-label">svi_ip</label>
-                    <div class="col-sm-10">
+                    <div className="col-sm-10">
                         <input
                             className="form-control"
                             type="text"
                             name="svi_ip"
                             id="svi_ip"
-                            value={svi_ip}
+                            value={svi_ip || ''}
                             placeholder="10.1.10.254/24"
                             onChange={this.handleChange}
                             onBlur = {this.handleBlur} />
@@ -197,30 +212,30 @@ class Form extends Component {
                             <span style={{color: "red"}}>{this.state.errors["svi_ip"]}</span>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div className="mb-3 row">
                     <label htmlFor="svi_descr" className="col-sm-2 col-form-label">svi_descr</label>
-                    <div class="col-sm-10">
+                    <div className="col-sm-10">
                         <input
                             className="form-control"
                             type="text"
                             name="svi_descr"
                             id="svi_descr"
-                            value={svi_descr}
+                            value={svi_descr || ''}
                             placeholder="svi10"
                             onChange={this.handleChange}
                             onBlur = {this.handleBlur} />
                             <span style={{display: "block"}}><small className="form-text text-muted"><i>svi interface description (optional)</i></small></span>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div className="mb-3 row">
                     <label htmlFor="mtu" className="col-sm-2 col-form-label">mtu</label>
-                    <div class="col-sm-10">
+                    <div className="col-sm-10">
                         <input
                             className="form-control"
                             type="number"
                             name="mtu"
                             id="mtu"
-                            value={mtu}
+                            value={mtu || 1500}
                             placeholder="1500"
                             onChange={this.handleChange}
                             onBlur = {this.handleBlur} />
@@ -228,30 +243,30 @@ class Form extends Component {
                             <span style={{color: "red"}}>{this.state.errors["mtu"]}</span>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div className="mb-3 row">
                 <label htmlFor="vrf" className="col-sm-2 col-form-label">vrf</label>
-                    <div class="col-sm-10">
+                    <div className="col-sm-10">
                         <input
                             className="form-control"
                             type="text"
                             name="vrf"
                             id="vrf"
-                            value={vrf}
+                            value={vrf || ''}
                             placeholder="Tenant-1"
                             onChange={this.handleChange}
                             onBlur={this.handleBlur} />
                         <span style={{ display: "block" }}><small className="form-text text-muted"><i>default Tenant-1</i></small></span>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div className="mb-3 row">
                 <label htmlFor="mgroup" className="col-sm-2 col-form-label">mgroup</label>  
-                    <div class="col-sm-10">
+                    <div className="col-sm-10">
                         <input
                             className="form-control"
                             type="text"
                             name="mgroup"
                             id="mgroup"
-                            value={mgroup}
+                            value={mgroup || ''}
                             placeholder="239.0.0.10"
                             onChange={this.handleChange}
                             onBlur={this.handleBlur} />
@@ -259,18 +274,16 @@ class Form extends Component {
                         <span style={{ color: "red" }}>{this.state.errors["mgroup"]}</span>
                     </div>
                 </div>
-                <div class="mb-3 row">
+                <div className="mb-3 row">
                     <label htmlFor="arpsup" className="col-sm-2 col-form-label">Arp suppression</label>
-                    <div class="col-sm-5 mt-2">
-                        
+                    <div className="col-sm-5 mt-2">                        
                             <input
-                                class="form-check-input"
+                                className="form-check-input"
                                 type="checkbox"
                                 name="arpsup"
                                 id="arpsup"
                                 checked={arpsup}
-                                onChange={this.handleClickArpSup} />
-                        
+                                onChange={this.handleClickArpSup} />                        
                     </div>
                 </div>
                 <input type="button" value="Submit" onClick={this.submitForm} disabled={!this.state.formValid} className="btn btn-outline-success" />                

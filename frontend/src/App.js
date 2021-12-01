@@ -26,16 +26,71 @@ class App extends Component {
         this.setState({
             isOpen: true
         });        
-    };
+    }
 
     hideModal = () => {
         this.setState({
             isOpen: false
         });        
         delete this.state.index;
-    };
+    }
 
-    
+    restPostData = async (evpn) => {
+        try {
+            const res = await fetch(`${URL}`, {
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json",                    
+                },
+                body: JSON.stringify(evpn),
+            });
+
+            if (!res.ok) {
+                const message = `An error has occured: ${res.status} - ${res.statusText}`;
+                throw new Error(message);
+            }
+
+            const data = await res.json();
+
+            const result = {
+                status: res.status + "-" + res.statusText,
+                headers: {
+                    "Content-Type": res.headers.get("Content-Type"),
+                    "Content-Length": res.headers.get("Content-Length"),
+                },
+                data: data,
+            };
+
+            alert(JSON.stringify(result, null, 4));
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+
+    restPutData = async (item, evpn) => {
+
+    }
+
+    restDeleteData = async (vni) => {
+        if (vni) {
+            try {
+                const response = await fetch(`${URL}/${vni}`, { method: "delete" });
+                const data = await response.json();
+
+                const result = {
+                    status: response.status + "-" + response.statusText,
+                    headers: { "Content-Type": response.headers.get("Content-Type") },
+                    data: data,
+                };
+
+                alert(JSON.stringify(result, null, 4));
+            } catch (err) {
+                alert(err);
+            }
+        }
+    }
+
     evpnRemove = index => {
         const { evpnData, changes } = this.state;
         
@@ -44,12 +99,12 @@ class App extends Component {
         })
 
         // if you've just created a new evpn and then delete it, no change happened
-        const vlan_id = evpnData[index].vlan_id;
-        if (changes[vlan_id]==="new"){
-            delete changes[vlan_id];
+        const vni = evpnData[index].vni;
+        if (changes[vni]==="new"){
+            delete changes[vni];
         }
         else {
-            changes[vlan_id] = "del";
+            changes[vni] = "del";
         }
 
         this.setState({ evpnData: newEvpnData, changes: changes })        
@@ -70,37 +125,39 @@ class App extends Component {
             const newEvpnData = this.state.evpnData.slice();
             newEvpnData[index] = evpn; // replace old evpn data with a new one in the array
             
-            changes[evpn.vlan_id] = "edit";
+            changes[evpn.vni] = "edit";
             this.setState({ evpnData: newEvpnData, changes: changes });
         }
         else {
-            changes[evpn.vlan_id] = "new";
+            changes[evpn.vni] = "new";
             this.setState({ evpnData: [...this.state.evpnData, evpn], changes: changes });
         }
         this.hideModal();
     }
 
     handleSubmit = () => {
-        const { evpnData, changes } = this.state;
-        //alert(JSON.stringify(changes, null, 4))
+        const { evpnData, changes } = this.state;        
 
         for (let item in changes) {            
-            const index = evpnData.findIndex(x => Number(x.vlan_id)===Number(item));            
+            const index = evpnData.findIndex(x => Number(x.vni)===Number(item));            
             const evpn = evpnData[index];            
 
             switch (changes[item]) {
                 case "del":                    
-                    alert(`delete ${item}`)
-
+                    alert(`delete ${item}`);
+                    this.restDeleteData(item); 
                     break;
+
                 case "new":
-                    alert(`create ${evpn.vlan_id}`)
-
+                    alert(`create ${evpn.vni}`)
+                    this.restPostData(evpn); 
                     break;
+
                 case "edit":
-                    alert(`edit ${evpn.vlan_id}`)
-
+                    alert(`edit ${evpn.vni}`)
+                    this.restPutData(item, evpn)
                     break;
+
                 default:
                     console.log("incorrect value changes")
             }

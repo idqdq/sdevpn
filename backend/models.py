@@ -24,7 +24,7 @@ class EvpnDataClass(BaseModel):
     # mandatory data
     vlan_id: int = Field(..., gt=1, lt=4096)
     vni: int = Field(..., ge=10000, lt=10999)
-    svi_ip: IPv4Interface
+    svi_ip: Optional[IPv4Interface]
     # optional data (with defaults)
     vlan_name: str = None
     mtu: int = Field(1500, ge=1280, le=9216)

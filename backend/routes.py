@@ -65,23 +65,24 @@ async def getEvpn(vni: int):
 @app.post("/evpn")
 async def createEvpn(evpn: EvpnDataClass = Body(...)):
     evpn = jsonable_encoder(evpn)    
+    print(evpn)
     new_evpn = await app.db.evpn.insert_one(evpn)
     created_evpn = await app.db.evpn.find_one({"_id": new_evpn.inserted_id})
 
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_evpn)
 
 
-@app.put("/evpn/", response_description="Update evpn", response_model=EvpnDataClass)
-async def updateEvpn(evpn: EvpnDataClass = Body(...)):
+@app.put("/evpn/{vni}", response_description="Update evpn", response_model=EvpnDataClass)
+async def updateEvpn(vni: int, evpn: EvpnDataClass = Body(...)):
     evpn = jsonable_encoder(evpn)
     # update model shoudn't include _id because mongo will not allow mutate _id in update procedure 
     # so we have to create another data class for the update or just get rid of _id from the existed model 
     evpn.pop("_id") 
     
-    if (existed_evpn := await app.db.evpn.find_one({"vni": evpn["vni"]})) is not None:        
+    if (existed_evpn := await app.db.evpn.find_one({"vni": vni})) is not None:        
         update_res = await app.db.evpn.update_one({"_id": existed_evpn["_id"] }, {"$set": evpn})
         if update_res.modified_count == 1:
-            result = await app.db.evpn.find_one({"vni": evpn["vni"]})
+            result = await app.db.evpn.find_one({"vni": vni})
         else: 
             result = existed_evpn
                 
@@ -91,7 +92,13 @@ async def updateEvpn(evpn: EvpnDataClass = Body(...)):
     print(result)
     return JSONResponse(status_code=status.HTTP_200_OK, content=result)
   
+@app.delete("/evpn/{vni}", response_description="Delete evpn")
+async def deleteEvpn(vni: int):
+    delete_res = await app.db.evpn.delete_one({"vni": vni})
+    if delete_res.deleted_count == 1:
+        return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
 
+    raise HTTPException(status_code=404, detail=f"evpn {vni} not found")
 
 #if __name__ == "__main__":
 #    uvicorn.run(app, host="0.0.0.0", port=8000)
