@@ -35,61 +35,7 @@ class App extends Component {
         delete this.state.index;
     }
 
-    restPostData = async (evpn) => {
-        try {
-            const res = await fetch(`${URL}`, {
-                method: "post",
-                headers: {
-                    "Content-Type": "application/json",                    
-                },
-                body: JSON.stringify(evpn),
-            });
-
-            if (!res.ok) {
-                const message = `An error has occured: ${res.status} - ${res.statusText}`;
-                throw new Error(message);
-            }
-
-            const data = await res.json();
-
-            const result = {
-                status: res.status + "-" + res.statusText,
-                headers: {
-                    "Content-Type": res.headers.get("Content-Type"),
-                    "Content-Length": res.headers.get("Content-Length"),
-                },
-                data: data,
-            };
-
-            alert(JSON.stringify(result, null, 4));
-        } catch (err) {
-            alert(err.message);
-        }
-    }
-
-
-    restPutData = async (item, evpn) => {
-
-    }
-
-    restDeleteData = async (vni) => {
-        if (vni) {
-            try {
-                const response = await fetch(`${URL}/${vni}`, { method: "delete" });
-                const data = await response.json();
-
-                const result = {
-                    status: response.status + "-" + response.statusText,
-                    headers: { "Content-Type": response.headers.get("Content-Type") },
-                    data: data,
-                };
-
-                alert(JSON.stringify(result, null, 4));
-            } catch (err) {
-                alert(err);
-            }
-        }
-    }
+    
 
     evpnRemove = index => {
         const { evpnData, changes } = this.state;
@@ -142,27 +88,105 @@ class App extends Component {
             const index = evpnData.findIndex(x => Number(x.vni)===Number(item));            
             const evpn = evpnData[index];            
 
-            switch (changes[item]) {
-                case "del":                    
-                    alert(`delete ${item}`);
-                    this.restDeleteData(item); 
-                    break;
-
-                case "new":
-                    alert(`create ${evpn.vni}`)
+            switch (changes[item]) {              
+                case "new":                    
                     this.restPostData(evpn); 
                     break;
 
-                case "edit":
-                    alert(`edit ${evpn.vni}`)
+                case "edit":                    
                     this.restPutData(item, evpn)
                     break;
 
+                case "del":                                        
+                    this.restDeleteData(item); 
+                    break;
+
                 default:
-                    console.log("incorrect value changes")
+                    console.log("incorrect value in the changes")
+            }
+        }
+        this.setState({ changes: {}});
+    }
+    restPostData = async (evpn) => {
+        try {
+            const res = await fetch(`${URL}`, {
+                method: "post",
+                headers: {
+                    "Content-Type": "application/json",                    
+                },
+                body: JSON.stringify(evpn),
+            });
+
+            if (!res.ok) {
+                const message = `An error has occured: ${res.status} - ${res.statusText}`;
+                throw new Error(message);
+            }
+
+            const data = await res.json();
+
+            const result = {
+                status: res.status + "-" + res.statusText,
+                headers: {
+                    "Content-Type": res.headers.get("Content-Type"),
+                    "Content-Length": res.headers.get("Content-Length"),
+                },
+                data: data,
+            };
+
+            alert(JSON.stringify(result, null, 4));
+        } catch (err) {
+            alert(err.message);
+        }
+    }
+
+    restPutData = async (vni, evpn) => {
+        if (vni) {
+            try {
+                const response = await fetch(`${URL}/${vni}`, {
+                    method: "put",
+                    headers: {
+                        "Content-Type": "application/json",
+                    },
+                    body: JSON.stringify(evpn),
+                });
+
+                if (!response.ok) {
+                    const message = `An error has occured: ${response.status} - ${response.statusText}`;
+                    throw new Error(message);
+                }
+
+                const data = await response.json();
+
+                const result = {
+                    status: response.status + "-" + response.statusText,
+                    headers: { "Content-Type": response.headers.get("Content-Type") },
+                    data: data,
+                };
+
+                alert(JSON.stringify(result, null, 4));
+            } catch (err) {
+                alert(err)
             }
         }
     }
+
+    restDeleteData = async (vni) => {
+        if (vni) {
+            try {
+                const response = await fetch(`${URL}/${vni}`, { method: "delete" });
+                //const data = await response.json();
+
+                const result = {
+                    status: response.status,                   
+                };
+
+                alert(JSON.stringify(result, null, 4));
+            } catch (err) {
+                alert(err);
+            }
+        }
+    }
+
 
     render() {
         const { evpnData, changes, index, isOpen } = this.state

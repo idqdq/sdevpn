@@ -1,5 +1,5 @@
 #import uvicorn
-from fastapi import FastAPI, Request, Body, status, HTTPException
+from fastapi import FastAPI, Request, Response, Body, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.encoders import jsonable_encoder
 from fastapi.responses import JSONResponse
@@ -65,7 +65,7 @@ async def getEvpn(vni: int):
 @app.post("/evpn")
 async def createEvpn(evpn: EvpnDataClass = Body(...)):
     evpn = jsonable_encoder(evpn)    
-    print(evpn)
+    #print(evpn)
     new_evpn = await app.db.evpn.insert_one(evpn)
     created_evpn = await app.db.evpn.find_one({"_id": new_evpn.inserted_id})
 
@@ -96,7 +96,7 @@ async def updateEvpn(vni: int, evpn: EvpnDataClass = Body(...)):
 async def deleteEvpn(vni: int):
     delete_res = await app.db.evpn.delete_one({"vni": vni})
     if delete_res.deleted_count == 1:
-        return JSONResponse(status_code=status.HTTP_204_NO_CONTENT)
+        return Response(status_code=status.HTTP_204_NO_CONTENT)
 
     raise HTTPException(status_code=404, detail=f"evpn {vni} not found")
 
