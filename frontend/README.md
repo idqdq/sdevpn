@@ -1,16 +1,16 @@
-# frontend for the sdevpn controller
+# frontend for my sdevpn controller
 
 this is a React.js application.  
 *Kudo to [React Tutorial: An Overview and Walkthrough
 By Tania Rascia](https://www.taniarascia.com/getting-started-with-react/)*
 
-at first the application will be a simple table and form to manipulate (create | update | delete) evpn from|to the cisco nexus evpn fabric
+at first the application will be a simple SPA with a table and a form elements  
+the primary function is to manipulate (create | update | delete) EVPNSs from|to the cisco nexus evpn fabric
 
   ![img1](public/App1.png)
 
-next it will probably get some improvements like ACL and telemetry
+next it will probably get some improvements like ACLs and a telemetry
 
 ----
-note: to start app from within **frontend** folder type:  
+note: to start the front just type:  
 > \> npm start
-
