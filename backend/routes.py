@@ -65,10 +65,10 @@ async def getEvpn(vni: int):
 @app.post("/evpn")
 async def createEvpn(evpn: EvpnDataClass = Body(...)):
     evpn = jsonable_encoder(evpn)    
-    #print(evpn)
+    
     new_evpn = await app.db.evpn.insert_one(evpn)
     created_evpn = await app.db.evpn.find_one({"_id": new_evpn.inserted_id})
-
+    print(created_evpn)
     return JSONResponse(status_code=status.HTTP_201_CREATED, content=created_evpn)
 
 
